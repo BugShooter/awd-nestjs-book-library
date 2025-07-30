@@ -96,3 +96,109 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# How to create same project from scratch
+
+## 1. **Initialize the project**
+
+Use the terminal to navigate to your project directory and run the following command to initialize a new NestJS project:
+
+```bash
+npx @nestjs/cli new nestjs-ci
+cd nestjs-ci
+npm install
+```
+
+## 2. **Set up Git**
+
+Create a `.gitignore` file to exclude `node_modules` and other unnecessary files from being tracked by Git. You can use the following command:
+
+```bash
+touch .gitignore
+```
+
+Then add the following lines to your `.gitignore` file:
+
+```
+# .gitignore
+node_modules
+dist
+```
+
+Then, run the following commands to initialize Git and make your first commit:
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+```
+
+## 3. **Create a GitHub repository** using gh CLI
+
+Install the GitHub CLI if you haven't already. You can find installation instructions [here](https://cli.github.com/).
+
+
+Authorize the GitHub CLI with your GitHub account by running:
+```bash
+gh auth login
+```
+
+Then, create a new repository on GitHub using the following command:
+```bash
+gh repo create nestjs-ci --public --source=. --remote=origin
+```
+
+## 4. **Create a GitHub Actions workflow**
+
+Create a new directory called `.github/workflows` in your project root and create a file named `ci.yml` inside it:
+
+```bash
+mkdir -p .github/workflows
+touch .github/workflows/ci.yml
+``` 
+
+Then, add the following content to the `ci.yml` file:
+
+```yaml
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+```
+This workflow will run on every push or pull request to the `main` branch. It checks out the code, installs Node.js, installs dependencies using `npm ci`, and runs tests.
+
+For npm ci command It's important to ensure that your have `package-lock.json` committed to your repository, as `npm ci` relies on it to install the exact versions of dependencies specified in the lock file.
+
+## 5. **Commit and push changes**
+
+Add the `.github/workflows/ci.yml` file to your Git repository, commit the changes, and push them to GitHub:
+
+```bash
+git add .github/workflows/ci.yml
+git commit -m "Add CI workflow"
+git push origin main
+```
+
+This will trigger the GitHub Actions workflow you just created.
+
+## 6. **Verify the CI workflow**
+
+Go to your GitHub repository and navigate to the "Actions" tab. You should see the workflow running. If everything is set up correctly, it will pass the tests and show a green checkmark.
+
