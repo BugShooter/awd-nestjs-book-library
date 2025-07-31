@@ -367,7 +367,7 @@ Explanation of the `plainToClass` function:
 Update the `books.controller.ts` file in the `src/books` directory to implement the CRUD operations for the books resource. Here is an example of how you can implement the controller.
 
 ```typescript
-import { ApiAcceptedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { ResponseBookDto } from './dto/response-book.dto';
 import { UUID } from 'node:crypto';
 import { ParseUUIDPipe } from '@nestjs/common';
@@ -377,20 +377,38 @@ import { plainToClass } from '@nestjs/class-transformer';
 export class BooksController {
   constructor(private readonly booksService: BooksService) { }
 
-  @Get(':id')
-  @ApiOperation({ summary: "Get a book by ID" })
-  @ApiAcceptedResponse({ description: "A single book" })
-  @ApiNotFoundResponse({ description: "Book not found" })
-  async findOne(@Param('id', ParseUUIDPipe) id: UUID): Promise<ResponseBookDto> {
-    const book = await this.booksService.findOne(id)
-    if (!book) throw new NotFoundException('Book not found')
-    return plainToClass(ResponseBookDto, book)
+  @Get()
+  @ApiOperation({ summary: 'List all books' })
+  @ApiOkResponse({
+    description: 'A list of books',
+    type: ResponseBookDto,
+    isArray: true
+  })
+  async findAll(): Promise<ResponseBookDto[]> {
+    const books = await this.booksService.findAll();
+    return plainToClass(ResponseBookDto, books);
   }
+
+ @Get(':id')
+  @ApiOperation({ summary: 'Get a book by ID' })
+  @ApiOkResponse({
+    description: 'A single book',
+    type: ResponseBookDto
+  })
+  @ApiNotFoundResponse({ description: 'Book not found' })
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: UUID,
+  ): Promise<ResponseBookDto> {
+    const book = await this.booksService.findOne(id);
+    if (!book) throw new NotFoundException('Book not found');
+    return plainToClass(ResponseBookDto, book);
+  }
+}
 ```
 
 ### Documentation of the BooksController
 
-Use the decorators from `@nestjs/swagger` like `@ApiOperation`, `@ApiAcceptedResponse`, and `@ApiNotFoundResponse` to document the API endpoints.
+Use the decorators from `@nestjs/swagger` like `@ApiOperation`, `@ApiOkResponse`, and `@ApiNotFoundResponse` to document the API endpoints.
 
 ### Incoming request validation
 
