@@ -1,4 +1,3 @@
-{# Readme file about awd-nestjs-book-library as a challange part of AWD #}
 # NestJS Book Library API
 
 <p align="center">
