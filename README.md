@@ -230,8 +230,185 @@ This will set up Swagger documentation for your API at the `/api/docs` endpoint.
 
 To view the Swagger UI, start your NestJS application `npm start` and navigate to `http://localhost:3000/api` in your web browser.
 
-## 9. Update the `books` resource corresponding to the OpenAPI specification
-Update the generated `books` resource to implement the CRUD operations as per your requirements. You can modify the controller and service files to handle the logic for creating, reading, updating, and deleting books.
+## 9. Implement DTOs for the `books` resource corresponding to the OpenAPI specification
 
-Update dto files to include validation decorators and Swagger decorators for API documentation.
+To implement the OpenAPI specification for the `books` resource, you need to have 3 DTOs: `create-book.dto.ts`, `update-book.dto.ts` and `response-book.dto.ts`.
 
+In this step, we will create the DTOs and use decorators for validation, transformation and documentation.
+- **Validation**: Ensures that the data sent to the API meets certain criteria (e.g., required fields, data types).
+- **Transformation**: Converts the data into a specific format or structure before it is processed by the application.
+- **Documentation**: Provides metadata about the API endpoints, making it easier for developers to understand how to use the API.
+
+### Install the necessary packages:
+
+```bash
+npm install @nestjs/class-validator @nestjs/class-transformer @nestjs/swagger
+```
+
+In the create book DTO, you will define the properties required to create a new book.
+
+### Create book DTO
+
+Update a file named `create-book.dto.ts` in the `src/books/dto` directory:
+
+```typescript
+import { IsNotEmpty, IsInt, IsString } from "@nestjs/class-validator"
+import { ApiProperty } from "@nestjs/swagger"
+
+export class CreateBookDto {
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: "The Great Gatsby" })
+    title: string
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: "F. Scott Fitzgerald" })
+    author: string
+
+    @IsNotEmpty()
+    @IsInt()
+    @ApiProperty({ example: "1925" })
+    publishedYear: number
+}
+```
+Used decorators:
+- `@IsNotEmpty()`: Ensures that the field is not empty.
+- `@IsString()`: Validates that the field is a string.
+- `@IsInt()`: Validates that the field is an integer.
+- `@ApiProperty()`: Provides metadata for Swagger documentation, including an example value.
+
+### Update book DTO
+
+The update book DTO will have the same properties but will allow partial updates.
+
+### Response book DTO
+
+The response book DTO will define the structure of the book object returned by the API.
+Create a file named `response-book.dto.ts` in the `src/books/dto` directory:
+
+```typescript
+import { Expose } from "@nestjs/class-transformer"
+import { IsInt, IsString, IsUUID } from "@nestjs/class-validator"
+
+export class ResponseBookDto {
+    @Expose()
+    @IsUUID()
+    id: string
+
+    @Expose()
+    @IsString()
+    title: string
+
+    @Expose()
+    @IsString()
+    author: string
+
+    @Expose()
+    @IsInt()
+    publishedYear: number
+}
+```
+Explanation of decorators used:
+- `@Expose()`: Indicates that the property should be included in the serialized output.
+- `@IsUUID()`: Validates that the field is a valid UUID.
+- `@IsString()`: Validates that the field is a string.
+- `@IsInt()`: Validates that the field is an integer.
+- `@ApiProperty()`: Provides metadata for Swagger documentation, including an example value.
+
+## 10. Enable Validation and Transformation to work
+
+There are two main parts to enable validation and transformation in your NestJS application: incoming requests and outgoing responses.
+
+### Incoming Requests
+
+To enable validation and transformation in your NestJS application for incoming requests, you need to set up global pipes in your `main.ts` file:
+
+```typescript
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({
+      transform: true, // Enable transformation of payloads
+      whitelist: true, // Strip properties that are not in the DTO
+      forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are present
+  }));
+  await app.listen(3000);
+}
+bootstrap();
+```
+Explanation of the options used in `ValidationPipe`:
+- `transform: true`: Automatically transforms the payload into the DTO class instance.
+- `whitelist: true`: Strips properties that are not defined in the DTO.
+- `forbidNonWhitelisted: true`: Throws an error if non-whitelisted properties are present.
+
+### Outgoing Responses
+
+For the outgoing response the NestJS don't apply the validation and transformation by automatically, so you need to use to use plainToClass function from `@nestjs/class-transformer` in the  controller where you return the response.
+
+```typescript
+import { plainToClass } from '@nestjs/class-transformer';
+import { ResponseBookDto } from './dto/response-book.dto';
+
+@Get(':id')
+async findOne(@Param('id') id: string): Promise<ResponseBookDto> {
+  const book = await this.booksService.findOne(id);
+  return plainToClass(ResponseBookDto, book); // Transform the book object to ResponseBookDto.
+}
+```
+Explanation of the `plainToClass` function:
+- `plainToClass(ResponseBookDto, book)`: Converts the plain JavaScript object `book` into an instance of the `ResponseBookDto` class, applying any transformation and validation defined in the DTO.
+
+### 11. **Implement the BooksController**
+
+Update the `books.controller.ts` file in the `src/books` directory to implement the CRUD operations for the books resource. Here is an example of how you can implement the controller.
+
+```typescript
+import { ApiAcceptedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ResponseBookDto } from './dto/response-book.dto';
+import { UUID } from 'node:crypto';
+import { ParseUUIDPipe } from '@nestjs/common';
+import { plainToClass } from '@nestjs/class-transformer';
+
+@Controller('books')
+export class BooksController {
+  constructor(private readonly booksService: BooksService) { }
+
+  @Get(':id')
+  @ApiOperation({ summary: "Get a book by ID" })
+  @ApiAcceptedResponse({ description: "A single book" })
+  @ApiNotFoundResponse({ description: "Book not found" })
+  async findOne(@Param('id', ParseUUIDPipe) id: UUID): Promise<ResponseBookDto> {
+    const book = await this.booksService.findOne(id)
+    if (!book) throw new NotFoundException('Book not found')
+    return plainToClass(ResponseBookDto, book)
+  }
+```
+
+### Documentation of the BooksController
+
+Use the decorators from `@nestjs/swagger` like `@ApiOperation`, `@ApiAcceptedResponse`, and `@ApiNotFoundResponse` to document the API endpoints.
+
+### Incoming request validation
+
+Use the ParseUUIDPipe from `@nestjs/common` to validate the incoming request parameters, such as the book ID. This ensures that the ID is a valid UUID before processing the request.
+
+### Outgoing response transformation with plainToClass
+
+Use the `plainToClass` function from `@nestjs/class-transformer` to transform the response object to the DTO. This ensures that the response adheres to the structure defined in the DTO and applies any necessary transformations.
+
+### Asynchronous operations
+
+Use async/await for asynchronous operations to handle the database calls in a non-blocking manner.
+Note that the return type of asynchronous function is `Promise<SomeType>`, regardless of the actual type returned by the function.
+
+### Typing the response
+
+Use the `ResponseBookDto` as the return type for the `findOne`, `update`, and `remove` methods to ensure that the response adheres to the structure defined in the DTO.
+
+### Exception handling
+
+Use the `NotFoundException` from `@nestjs/common` to handle cases where a book is not found. This will return a 404 status code and a descriptive error message.
