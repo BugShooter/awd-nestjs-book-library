@@ -1,32 +1,15 @@
+{# Readme file about awd-nestjs-book-library as a challange part of AWD #}
+# NestJS Book Library API
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="https://nestjs.com/" target="_blank"><img src="https://nestjs.com/img/logo_text.svg" alt="NestJS Logo"></a>
+  <br>
+  <a href="https://github.com/BugShooter/awd-nestjs-book-library/actions/workflows/ci.yml" target="_blank"><img src="https://github.com/BugShooter/awd-nestjs-book-library/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-  <a href="https://github.com/BugShooter/awd-nestjs-ci/actions/workflows/ci.yml" target="_blank"><img src="https://github.com/BugShooter/awd-nestjs-ci/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This project is a part of the challenge from "Advanced Web Development" Bootcamp, where we focus on building a NestJS application that serves as a book library API corresponding to the OpenAPI specification. The API allows users to perform CRUD operations on books, including creating, reading, updating, and deleting book records.
 
 ## Project setup
 
@@ -204,4 +187,51 @@ This will trigger the GitHub Actions workflow you just created.
 ## 6. **Verify the CI workflow**
 
 Go to your GitHub repository and navigate to the "Actions" tab. You should see the workflow running. If everything is set up correctly, it will pass the tests and show a green checkmark.
+
+## 7. **Generate the NestJS resource for books**
+
+To generate the CRUD (Create, Read, Update, Delete) operations for the books, you can use the NestJS CLI to generate a new resource:
+
+```bash
+npx @nestjs/cli generate resource books
+```
+
+This command will create a new `books` module, controller, and service in your project.
+
+## 8. **Add OpenAPI support (optional)**
+
+To add OpenAPI support to your NestJS application, you can use the `@nestjs/swagger` package. Install it by running:
+
+```bash
+npm install @nestjs/swagger
+```
+
+Then, update your `main.ts` file to set up Swagger:
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  const config = new DocumentBuilder()
+    .setTitle('Book Library API')
+    .setDescription('A simple API to manage a collection of books')
+    .setVersion('1.0.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+  await app.listen(3000);
+}
+bootstrap();
+```
+This will set up Swagger documentation for your API at the `/api/docs` endpoint.
+
+To view the Swagger UI, start your NestJS application `npm start` and navigate to `http://localhost:3000/api` in your web browser.
+
+## 9. Update the `books` resource corresponding to the OpenAPI specification
+Update the generated `books` resource to implement the CRUD operations as per your requirements. You can modify the controller and service files to handle the logic for creating, reading, updating, and deleting books.
+
+Update dto files to include validation decorators and Swagger decorators for API documentation.
 
