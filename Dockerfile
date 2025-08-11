@@ -24,8 +24,9 @@ LABEL org.opencontainers.image.title="Simple NestJS Application (Bootcamp Challe
 WORKDIR /app
 
 COPY --from=build /build/dist ./dist
-COPY --from=build /build/node_modules ./node_modules
+#COPY --from=build /build/node_modules ./node_modules
 COPY --from=build /build/*.json ./
+RUN npm ci --omit=dev
 
 EXPOSE 3000
 
