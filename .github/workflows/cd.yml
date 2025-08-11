@@ -1,12 +1,10 @@
-name: GitHub Continuous Integration and Continuous Deployment
+name: CD
 
 on:
-  # push:
-  #   branches: [ 'feature/cicd' ]
   workflow_run:
-    workflows: ["GitHub Continuous Integration"] # workflow's name from ci.yml
-    types:
-      - completed
+    workflows: ["CI"] # workflow's name from ci.yml
+    types: [completed]
+    branches: [feature/cicd]
 
 jobs:
   deploy:
