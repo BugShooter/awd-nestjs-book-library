@@ -12,7 +12,8 @@ async function bootstrap() {
     .setTitle('Book Library API')
     .setDescription('A simple API to manage a collection of books')
     .setVersion('1.0.0')
-    .addServer('http://localhost:3000/api', 'Local development server')
+    .addServer('http://localhost:3000', 'Local development server')
+    .addServer('https://awd-nestjs.onrender.com', 'Production server')
     .build();
   const documentFactory = () => {
     const doc = SwaggerModule.createDocument(app, config);
