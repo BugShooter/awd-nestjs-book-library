@@ -4,3 +4,11 @@ dist/
 
 # ignore coverage directory
 coverage/
+
+# ignore environment files
+.env
+.env.*
+
+# ignore local development files
+*.local
+*.local.*
