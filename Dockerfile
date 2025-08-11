@@ -12,7 +12,8 @@ COPY eslint.config.mjs ./
 COPY *.json ./
 
 RUN npm ci
-RUN npm run test
+# Now we run tests in the CI workflow
+# RUN npm run test
 RUN npm run build --only=production
 
 FROM node:24-alpine
