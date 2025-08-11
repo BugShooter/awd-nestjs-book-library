@@ -2,11 +2,10 @@ name: GitHub Continuous Integration
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'feature/cicd' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'feature/cicd' ]
   workflow_dispatch:
-
 
 jobs:
   build:
