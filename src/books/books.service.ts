@@ -14,7 +14,8 @@ export class BooksService {
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     const draftBook = {
-      id: crypto.randomUUID(),
+      // TypeORM will automatically generate the ID if not provided
+      // id: crypto.randomUUID(),
       title: createBookDto.title,
       author: createBookDto.author,
       publishedYear: createBookDto.publishedYear,
@@ -31,13 +32,11 @@ export class BooksService {
     return this.bookRepository.findOne({ where: { id } });
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async update(id: UUID, updateBookDto: UpdateBookDto): Promise<boolean> {
     const result = await this.bookRepository.update(id, updateBookDto);
     return Boolean(result.affected);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async remove(id: UUID): Promise<boolean> {
     const result = await this.bookRepository.delete(id);
     return Boolean(result.affected);
