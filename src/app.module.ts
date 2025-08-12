@@ -9,16 +9,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      ssl: true,
+      ssl: process.env.DATABASE_SSL
+        ? Boolean(process.env.DATABASE_SSL)
+        : process.env.NODE_ENV === 'production'
+          ? { rejectUnauthorized: false } // This is important for self-signed certificates
+          : true,
       // ssl: false, // For local docker pg
-      // ssl: {
-      //   rejectUnauthorized: false, // This is important for self-signed certificates
-      // },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: false,
     }),
-    BooksModule
+    BooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
