@@ -8,10 +8,16 @@ on:
 
 jobs:
   deploy:
-    environment: "render.com"  # GitHub environment for the secrets
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    environment: "render.com"  # GitHub environment for the secrets
     steps:
+    -
+      name: Debug Environment
+      run: |
+        echo "Using environment: ${{ github.environment }}"
+        echo "DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}"    
+        echo "DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}"    
     - 
       name: Checkout code
       uses: actions/checkout@v4
