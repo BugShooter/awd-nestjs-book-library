@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseUUIDPipe, NotFoundException, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  NotFoundException,
+  Put,
+} from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -47,7 +57,9 @@ export class BooksController {
     type: ResponseBookDto,
   })
   @ApiNotFoundResponse({ description: 'Book not found' })
-  async findOne(@Param('id', ParseUUIDPipe) id: UUID): Promise<ResponseBookDto> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: UUID,
+  ): Promise<ResponseBookDto> {
     const book = await this.booksService.findOne(id);
     if (!book) throw new NotFoundException('Book not found');
     return plainToClass(ResponseBookDto, book);
@@ -60,7 +72,10 @@ export class BooksController {
     type: ResponseBookDto,
   })
   @ApiNotFoundResponse({ description: 'Book not found' })
-  async update(@Param('id', ParseUUIDPipe) id: UUID, @Body() updateBookDto: UpdateBookDto): Promise<ResponseBookDto> {
+  async update(
+    @Param('id', ParseUUIDPipe) id: UUID,
+    @Body() updateBookDto: UpdateBookDto,
+  ): Promise<ResponseBookDto> {
     const success = await this.booksService.update(id, updateBookDto);
     if (!success) {
       throw new NotFoundException('Book not found');

@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Book } from '../entities/book.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-
 describe('BooksController', () => {
   let controller: BooksController;
   let mockRepository: Partial<Repository<Book>>;

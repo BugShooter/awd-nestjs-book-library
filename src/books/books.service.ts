@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class BooksService {
   constructor(
-    @InjectRepository(Book) private readonly bookRepository: Repository<Book>
-  ) { }
+    @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
+  ) {}
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     const draftBook = {
