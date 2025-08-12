@@ -14,7 +14,9 @@ export class BooksService {
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     const draftBook = {
-      id: crypto.randomUUID(),
+      // The manual ID generation is unnecessary since the Book entity uses @PrimaryGeneratedColumn('uuid').
+      // TypeORM will automatically generate UUIDs, so this line should be removed.
+      // id: crypto.randomUUID(),
       title: createBookDto.title,
       author: createBookDto.author,
       publishedYear: createBookDto.publishedYear,
@@ -31,13 +33,11 @@ export class BooksService {
     return this.bookRepository.findOne({ where: { id } });
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async update(id: UUID, updateBookDto: UpdateBookDto): Promise<boolean> {
     const result = await this.bookRepository.update(id, updateBookDto);
     return Boolean(result.affected);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async remove(id: UUID): Promise<boolean> {
     const result = await this.bookRepository.delete(id);
     return Boolean(result.affected);
