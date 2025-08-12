@@ -16,8 +16,8 @@ jobs:
       name: Debug Environment
       run: |
         echo "Using environment: ${{ github.environment }}"
-        echo "DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}"    
-        echo "DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}"    
+        # echo "DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}"
+        # echo "DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}"
     - 
       name: Checkout code
       uses: actions/checkout@v4
@@ -38,4 +38,8 @@ jobs:
         file: Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/awd-nestjs:latest
-
+    -
+      name: Deploy to Render
+      run: |
+        echo "Deploying to Render..."
+        curl -X POST ${{ secrets.RENDER_DEPLOY_URL }}
